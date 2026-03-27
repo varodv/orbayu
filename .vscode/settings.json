@@ -47,5 +47,15 @@
     "scss",
     "pcss",
     "postcss"
-  ]
+  ],
+
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // https://tailwindcss.nuxtjs.org/tailwindcss/editor-support
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  }
 }

@@ -4,3 +4,7 @@ trustPolicy: no-downgrade
 
 allowBuilds:
   esbuild: true
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
