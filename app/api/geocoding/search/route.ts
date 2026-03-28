@@ -60,20 +60,20 @@ export async function GET(request: Request) {
 
     const data = (await response.json()) as OpenMeteoGeocodingResponse;
 
-    const result
-      = data.results?.map<Location>(currentResult => ({
-        id: currentResult.id.toString(),
-        name: currentResult.name,
-        region: currentResult.admin1,
-        country: currentResult.country,
-        countryCode: currentResult.country_code,
-        latitude: currentResult.latitude,
-        longitude: currentResult.longitude,
-        altitude: currentResult.elevation,
-        timezone: currentResult.timezone,
+    const locations
+      = data.results?.map<Location>(result => ({
+        id: result.id.toString(),
+        name: result.name,
+        region: result.admin1,
+        country: result.country,
+        countryCode: result.country_code,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        altitude: result.elevation,
+        timezone: result.timezone,
       })) ?? [];
 
-    return NextResponse.json(result);
+    return NextResponse.json(locations);
   }
   catch (error) {
     console.error(error);
