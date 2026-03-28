@@ -1,9 +1,13 @@
+allowBuilds:
+  esbuild: true
+  msw: true
+
 shellEmulator: true
 
 trustPolicy: no-downgrade
 
-allowBuilds:
-  esbuild: true
+trustPolicyExclude:
+  - semver
 
 ignoredBuiltDependencies:
   - sharp

@@ -24,7 +24,7 @@ export default antfu(
     ignores: ['.agents'],
   },
   {
-    ignores: ['**/*.json', '**/*.md'],
+    ignores: ['**/*.json', '**/*.md', 'components/ui/**'],
     rules: {
       'max-len': [
         'error',
