@@ -21,6 +21,11 @@ export default antfu(
     },
   },
   {
+    rules: {
+      'ts/strict-boolean-expressions': 'off',
+    },
+  },
+  {
     ignores: ['.agents'],
   },
   {
