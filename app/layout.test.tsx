@@ -2,6 +2,14 @@ import { render, screen } from '@testing-library/react';
 import RootLayout from './layout';
 
 describe('RootLayout', () => {
+  beforeAll(() => {
+    vi.mock('next/font/google', () => ({
+      Geist: () => ({
+        variable: '--font-sans',
+      }),
+    }));
+  });
+
   it('should render its children', () => {
     render(
       <RootLayout>
