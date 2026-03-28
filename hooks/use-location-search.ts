@@ -16,7 +16,7 @@ export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
   const [query, setQuery] = useState('');
 
   const { status, data, error, refetch } = useQuery({
-    queryKey: ['geocoding-search', query],
+    queryKey: ['location-search', query],
     queryFn: async () => {
       const trimmedQuery = query.trim();
       if (trimmedQuery.length < 2) {
