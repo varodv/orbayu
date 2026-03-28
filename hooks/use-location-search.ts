@@ -10,7 +10,7 @@ interface Props {
   debounce?: number;
 }
 
-export function useGeocodingSearch({ limit = 10, debounce = 0 }: Props = {}) {
+export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
   const { locale } = useIntl();
 
   const [query, setQuery] = useState('');
