@@ -21,14 +21,16 @@ const geist = Geist({
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className={cn('overflow-auto h-full font-sans antialiased', geist.variable)}>
-      <body className="flex flex-col gap-4 min-h-full max-w-xl p-4 mx-auto">
-        <main className="flex-1">
+    <html lang="en" className={cn('h-full font-sans antialiased', geist.variable)}>
+      <body className="h-full">
+        <div className="flex flex-col gap-4 max-w-xl min-h-full p-4 mx-auto">
           <IntlProvider>
-            <QueryClientProvider>{children}</QueryClientProvider>
+            <QueryClientProvider>
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </QueryClientProvider>
           </IntlProvider>
-        </main>
-        <Footer />
+        </div>
       </body>
     </html>
   );
