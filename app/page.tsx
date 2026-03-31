@@ -1,11 +1,10 @@
 'use client';
 
-import type { Location } from '@/types/geocoding';
-import { useState } from 'react';
 import { LocationPicker } from '@/components/location-picker';
+import { useLocation } from '@/hooks/use-location';
 
 export default function Home() {
-  const [location, setLocation] = useState<Location>();
+  const { location, setLocation } = useLocation();
 
   return (
     <div className="flex flex-col gap-4">
