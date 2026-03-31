@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/command';
 import { useLocationSearch } from '@/hooks/use-location-search';
 import { cn } from '@/lib/utils';
+import { MatchingText } from './matching-text';
 
 interface Props {
   className?: string;
@@ -96,7 +97,7 @@ export function LocationPicker({ className, value, onChange }: Props) {
                                         <MapPinIcon className="size-5" />
                                       )}
                                   <span className="truncate">
-                                    {location.name}
+                                    <MatchingText text={location.name} match={query} />
                                     {' '}
                                     <span className="text-muted-foreground text-xs">
                                       {[location.region, location.country]
