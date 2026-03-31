@@ -62,9 +62,7 @@ export function LocationPicker({ className, value, onChange }: Props) {
           <CommandList>
             {isShortQuery
               ? (
-                  <CommandEmpty>
-                    {$t({ id: 'location-picker.search.help' })}
-                  </CommandEmpty>
+                  <CommandEmpty>{$t({ id: 'location-picker.search.help' })}</CommandEmpty>
                 )
               : (
                   <>

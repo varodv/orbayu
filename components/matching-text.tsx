@@ -24,9 +24,7 @@ export function MatchingText({ text, match = '' }: Props) {
   return (
     <>
       {text.slice(0, index)}
-      <span className="font-semibold">
-        {text.slice(index, index + match.length)}
-      </span>
+      <span className="font-semibold">{text.slice(index, index + match.length)}</span>
       {text.slice(index + match.length)}
     </>
   );
