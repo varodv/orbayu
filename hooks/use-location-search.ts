@@ -29,9 +29,13 @@ export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
       });
       const url = `/api/geocoding/search?${urlParams.toString()}`;
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to search for locations');
+      }
       return (await response.json()) as Array<Location>;
     },
     enabled: false,
+    retry: false,
   });
 
   useEffect(() => {
