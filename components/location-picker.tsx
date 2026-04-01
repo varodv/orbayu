@@ -1,7 +1,13 @@
 'use client';
 
 import type { Location } from '@/types/geocoding';
-import { LoaderCircleIcon, MapPinCheckIcon, MapPinIcon } from 'lucide-react';
+import {
+  LoaderCircleIcon,
+  LocateIcon,
+  LocateOffIcon,
+  MapPinCheckIcon,
+  MapPinIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Button } from '@/components/ui/button';
@@ -15,6 +21,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { useLocationSearch } from '@/hooks/use-location-search';
+import { useUserLocation } from '@/hooks/use-user-location';
 import { cn } from '@/lib/utils';
 import { MatchingText } from './matching-text';
 
@@ -30,7 +37,6 @@ export function LocationPicker({ className, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
 
   const { query, status, data, setQuery } = useLocationSearch({
-    limit: 5,
     debounce: 300,
   });
 
@@ -60,58 +66,103 @@ export function LocationPicker({ className, value, onChange }: Props) {
             onValueChange={setQuery}
           />
           <CommandList>
-            {isShortQuery
+            {!query
               ? (
-                  <CommandEmpty>{$t({ id: 'location-picker.search.help' })}</CommandEmpty>
+                  <CommandGroup>
+                    <UserLocationItem onSelect={onSelect} />
+                  </CommandGroup>
                 )
-              : (
-                  <>
-                    {status === 'pending' && (
-                      <CommandEmpty>
-                        <LoaderCircleIcon className="mx-auto size-5 animate-spin" />
-                      </CommandEmpty>
-                    )}
-                    {status === 'error' && (
-                      <CommandEmpty className="text-destructive">
-                        {$t({ id: 'location-picker.search.error' })}
-                      </CommandEmpty>
-                    )}
-                    {status === 'success'
-                      && (!data?.length
-                        ? (
-                            <CommandEmpty>
-                              {$t({ id: 'location-picker.search.empty' })}
-                            </CommandEmpty>
-                          )
-                        : (
-                            <CommandGroup>
-                              {data.map(location => (
-                                <CommandItem key={location.id} onSelect={() => onSelect(location)}>
-                                  {location.id === value?.id
-                                    ? (
-                                        <MapPinCheckIcon className="size-5" />
-                                      )
-                                    : (
-                                        <MapPinIcon className="size-5" />
-                                      )}
-                                  <span className="truncate">
-                                    <MatchingText text={location.name} match={query} />
-                                    {' '}
-                                    <span className="text-muted-foreground text-xs">
-                                      {[location.region, location.country]
-                                        .filter(Boolean)
-                                        .join(', ')}
+              : isShortQuery
+                ? (
+                    <CommandEmpty>{$t({ id: 'location-picker.search.help' })}</CommandEmpty>
+                  )
+                : (
+                    <>
+                      {status === 'pending' && (
+                        <CommandEmpty>
+                          <LoaderCircleIcon className="mx-auto size-5 animate-spin" />
+                        </CommandEmpty>
+                      )}
+                      {status === 'error' && (
+                        <CommandEmpty className="text-destructive">
+                          {$t({ id: 'location-picker.search.error' })}
+                        </CommandEmpty>
+                      )}
+                      {status === 'success'
+                        && (!data?.length
+                          ? (
+                              <CommandEmpty>
+                                {$t({ id: 'location-picker.search.empty' })}
+                              </CommandEmpty>
+                            )
+                          : (
+                              <CommandGroup>
+                                {data.map(location => (
+                                  <CommandItem
+                                    key={location.id}
+                                    onSelect={() => onSelect(location)}
+                                  >
+                                    {location.id === value?.id
+                                      ? (
+                                          <MapPinCheckIcon className="size-5" />
+                                        )
+                                      : (
+                                          <MapPinIcon className="size-5" />
+                                        )}
+                                    <span className="truncate">
+                                      <MatchingText text={location.name} match={query} />
+                                      {' '}
+                                      <span className="text-muted-foreground text-xs">
+                                        {[location.region, location.country]
+                                          .filter(Boolean)
+                                          .join(', ')}
+                                      </span>
                                     </span>
-                                  </span>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          ))}
-                  </>
-                )}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            ))}
+                    </>
+                  )}
           </CommandList>
         </Command>
       </CommandDialog>
     </>
+  );
+}
+
+function UserLocationItem({ onSelect }: { onSelect: (location: Location) => void }) {
+  const { $t } = useIntl();
+
+  const { permission, status, data, check } = useUserLocation();
+
+  return (
+    <CommandItem
+      disabled={status === 'pending' || permission === 'denied'}
+      onSelect={() => {
+        void check().then(() => data && onSelect(data));
+      }}
+    >
+      {permission === 'denied'
+        ? (
+            <LocateOffIcon className="size-5" />
+          )
+        : status === 'pending'
+          ? (
+              <LoaderCircleIcon className="size-5 animate-spin" />
+            )
+          : (
+              <LocateIcon className="size-5" />
+            )}
+      <span className={cn('truncate', status === 'error' && 'text-destructive')}>
+        {$t({
+          id: permission === 'denied'
+            ? 'location-picker.user.permission.denied'
+            : status === 'error'
+              ? 'location-picker.user.error'
+              : 'location-picker.user.current',
+        })}
+      </span>
+    </CommandItem>
   );
 }

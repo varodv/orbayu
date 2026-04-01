@@ -10,7 +10,7 @@ interface Props {
   debounce?: number;
 }
 
-export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
+export function useLocationSearch({ limit, debounce = 0 }: Props = {}) {
   const { locale } = useIntl();
 
   const [query, setQuery] = useState('');
@@ -25,7 +25,7 @@ export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
       const urlParams = new URLSearchParams({
         q: trimmedQuery,
         lang: locale,
-        limit: limit.toString(),
+        ...(limit && { limit: limit.toString() }),
       });
       const url = `/api/geocoding/search?${urlParams.toString()}`;
       const response = await fetch(url);
@@ -40,7 +40,7 @@ export function useLocationSearch({ limit = 10, debounce = 0 }: Props = {}) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      refetch().catch(() => {});
+      void refetch();
     }, debounce);
 
     return () => {
