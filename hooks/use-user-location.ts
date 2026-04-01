@@ -12,8 +12,8 @@ export function useUserLocation() {
 
   const [position, setPosition] = useState<GeolocationPosition>();
 
-  const { status, data, error, refetch } = useQuery({
-    queryKey: ['user-location'],
+  const { status, data, error } = useQuery({
+    queryKey: ['user-location', position],
     queryFn: async () => {
       if (!position) {
         return null;
@@ -31,7 +31,6 @@ export function useUserLocation() {
       }
       return (await response.json()) as Location;
     },
-    enabled: false,
     retry: false,
   });
 
@@ -44,10 +43,6 @@ export function useUserLocation() {
       void checkPosition();
     }
   }, [permission]);
-
-  useEffect(() => {
-    void refetch();
-  }, [position]);
 
   async function checkPermission() {
     if (typeof navigator === 'undefined' || !navigator.permissions) {
