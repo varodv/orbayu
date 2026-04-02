@@ -18,7 +18,7 @@ export function useUserLocation() {
       if (!position) {
         return null;
       }
-      const { latitude, longitude } = position.coords;
+      const { latitude, longitude, altitude } = position.coords;
       const urlParams = new URLSearchParams({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
@@ -29,7 +29,10 @@ export function useUserLocation() {
       if (!response.ok) {
         throw new Error('Failed to get user location');
       }
-      return (await response.json()) as Location;
+      return {
+        ...(await response.json()),
+        altitude,
+      } as Location;
     },
     retry: false,
   });
@@ -68,12 +71,9 @@ export function useUserLocation() {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      setPosition,
-      () => {
-        setPosition(undefined);
-      },
-    );
+    navigator.geolocation.getCurrentPosition(setPosition, () => {
+      setPosition(undefined);
+    });
   }
 
   async function check() {
