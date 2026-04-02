@@ -156,11 +156,12 @@ function UserLocationItem({ onSelect }: { onSelect: (location: Location) => void
             )}
       <span className={cn('truncate', status === 'error' && 'text-destructive')}>
         {$t({
-          id: permission === 'denied'
-            ? 'location-picker.user.permission.denied'
-            : status === 'error'
-              ? 'location-picker.user.error'
-              : 'location-picker.user.current',
+          id:
+            permission === 'denied'
+              ? 'location-picker.user.permission.denied'
+              : status === 'error'
+                ? 'location-picker.user.error'
+                : 'location-picker.user.current',
         })}
       </span>
     </CommandItem>
