@@ -32,6 +32,7 @@ export function useUserLocation() {
       return {
         ...(await response.json()),
         altitude,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       } as Location;
     },
     retry: false,
