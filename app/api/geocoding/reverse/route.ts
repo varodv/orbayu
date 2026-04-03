@@ -1,5 +1,6 @@
 import type { Location } from '@/types/geocoding';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 interface BigDataCloudReverseGeocodeResponse {
   latitude: number;
@@ -39,40 +40,26 @@ interface BigDataCloudReverseGeocodeResponse {
   >;
 }
 
+const queryParamsSchema = z.object({
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+  lang: z.string().optional().default('en'),
+});
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const latitudeParam = searchParams.get('latitude');
-    const longitudeParam = searchParams.get('longitude');
-    const lang = searchParams.get('lang') ?? 'en';
+    const queryParams = Object.fromEntries(searchParams.entries());
+    const parsedQueryParams = queryParamsSchema.safeParse(queryParams);
 
-    if (!latitudeParam || !longitudeParam) {
+    if (!parsedQueryParams.success) {
       return NextResponse.json(
-        { error: 'Missing required parameters: latitude, longitude' },
+        { error: 'Invalid parameters', details: z.flattenError(parsedQueryParams.error) },
         { status: 400 },
       );
     }
 
-    const latitude = Number.parseFloat(latitudeParam);
-    const longitude = Number.parseFloat(longitudeParam);
-
-    if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
-      return NextResponse.json(
-        { error: 'Invalid parameters: latitude, longitude must be numbers' },
-        { status: 400 },
-      );
-    }
-
-    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-      return NextResponse.json(
-        {
-          error:
-            'Invalid parameters: latitude must be in [-90, 90] range, '
-            + 'longitude must be in [-180, 180] range',
-        },
-        { status: 400 },
-      );
-    }
+    const { latitude, longitude, lang } = parsedQueryParams.data;
 
     const urlParams = new URLSearchParams({
       latitude: latitude.toString(),

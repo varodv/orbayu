@@ -1,5 +1,6 @@
 import type { Location } from '@/types/geocoding';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 interface OpenMeteoGeocodingResponse {
   results?: Array<{
@@ -26,24 +27,26 @@ interface OpenMeteoGeocodingResponse {
   }>;
 }
 
+const queryParamsSchema = z.object({
+  q: z.string().min(1),
+  lang: z.string().optional().default('en'),
+  limit: z.coerce.number().min(1).max(100).optional().default(10),
+});
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
-    const lang = searchParams.get('lang') ?? 'en';
-    const limitParam = searchParams.get('limit');
+    const queryParams = Object.fromEntries(searchParams.entries());
+    const parsedQueryParams = queryParamsSchema.safeParse(queryParams);
 
-    if (!query) {
-      return NextResponse.json({ error: 'Missing required parameter: q' }, { status: 400 });
+    if (!parsedQueryParams.success) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: z.flattenError(parsedQueryParams.error) },
+        { status: 400 },
+      );
     }
 
-    let limit = 10;
-    if (limitParam) {
-      const parsedLimitParam = Number.parseInt(limitParam, 10);
-      if (!Number.isNaN(parsedLimitParam) && parsedLimitParam > 0 && parsedLimitParam <= 100) {
-        limit = parsedLimitParam;
-      }
-    }
+    const { q: query, lang, limit } = parsedQueryParams.data;
 
     const urlParams = new URLSearchParams({
       name: query,
