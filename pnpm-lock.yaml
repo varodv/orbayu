@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     dependencies:
+      '@openmeteo/sdk':
+        specifier: 1.26.0
+        version: 1.26.0
       '@tanstack/react-query':
         specifier: 5.95.2
         version: 5.95.2(react@19.2.4)
@@ -25,6 +28,9 @@ importers:
       next:
         specifier: 16.2.1
         version: 16.2.1(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      openmeteo:
+        specifier: 1.2.3
+        version: 1.2.3
       radix-ui:
         specifier: 1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1525,6 +1531,13 @@ packages:
       {
         integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==,
       }
+
+  '@openmeteo/sdk@1.26.0':
+    resolution:
+      {
+        integrity: sha512-e6uSY2O8LEAPX4GjmKswSSE/94II2HV3YJ/G+GoCZ0JyFJe3rtBtZYLRqgJPwp6OISQVduKJdAt5XkpglmSbew==,
+      }
+    engines: { node: '>=12.0' }
 
   '@ota-meshi/ast-token-store@0.3.0':
     resolution:
@@ -4688,6 +4701,12 @@ packages:
       }
     engines: { node: '>=16' }
 
+  flatbuffers@25.9.23:
+    resolution:
+      {
+        integrity: sha512-MI1qs7Lo4Syw0EOzUl0xjs2lsoeqFku44KpngfIduHBYvzm8h2+7K8YMQh1JtVVVrUvhLpNwqVi4DERegUJhPQ==,
+      }
+
   flatted@3.2.9:
     resolution:
       {
@@ -6139,6 +6158,13 @@ packages:
         integrity: sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw==,
       }
     engines: { node: '>=20' }
+
+  openmeteo@1.2.3:
+    resolution:
+      {
+        integrity: sha512-3updmgCMnCAAjAgV3RfhMdIBPi/43RtbjQ4CizHGn52RP9SpgmVCDRpun+Ex75NG3jTF3pZp+d1BPlP9DWMHiQ==,
+      }
+    engines: { node: '>=12.0' }
 
   optionator@0.9.3:
     resolution:
@@ -8459,6 +8485,10 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
+  '@openmeteo/sdk@1.26.0':
+    dependencies:
+      flatbuffers: 25.9.23
+
   '@ota-meshi/ast-token-store@0.3.0': {}
 
   '@oxc-project/types@0.122.0': {}
@@ -10594,6 +10624,8 @@ snapshots:
       flatted: 3.2.9
       keyv: 4.5.4
 
+  flatbuffers@25.9.23: {}
+
   flatted@3.2.9: {}
 
   format@0.2.2: {}
@@ -11505,6 +11537,11 @@ snapshots:
       is-inside-container: 1.0.0
       powershell-utils: 0.1.0
       wsl-utils: 0.3.1
+
+  openmeteo@1.2.3:
+    dependencies:
+      '@openmeteo/sdk': 1.26.0
+      flatbuffers: 25.9.23
 
   optionator@0.9.3:
     dependencies:
