@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@source inline("{bg}-{red,orange,amber,yellow,lime}-{50,{100..900..100},950}");
+@source inline("{bg}-{green,emerald,teal,cyan,sky}-{50,{100..900..100},950}");
+@source inline("{bg}-{blue,indigo,violet,purple,fuchsia}-{50,{100..900..100},950}");
+@source inline("{bg}-{pink,rose,slate,gray,zinc}-{50,{100..900..100},950}");
+@source inline("{bg}-{neutral,stone,taupe,mauve,mist}-{50,{100..900..100},950}");
+@source inline("{bg}-{olive}-{50,{100..900..100},950}");
 
 @custom-variant dark (&:is(.dark *));
 

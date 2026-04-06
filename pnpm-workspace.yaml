@@ -8,6 +8,8 @@ trustPolicy: no-downgrade
 
 trustPolicyExclude:
   - semver
+  - reselect
+  - react-redux
 
 ignoredBuiltDependencies:
   - sharp

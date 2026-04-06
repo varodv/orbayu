@@ -26,7 +26,7 @@ export default antfu(
     },
   },
   {
-    ignores: ['.agents'],
+    ignores: ['.agents', 'components/ui/chart.tsx'],
   },
   {
     ignores: ['**/*.json', '**/*.md', 'components/ui/**'],
