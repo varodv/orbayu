@@ -83,8 +83,12 @@ export function TemperatureChart({ className, data }: Props) {
             const fillGradientId = `gradient-fill-${item.time.toISOString()}-${id}`;
             const fillGradientOffset
               = ((now.getTime() - item.time.getTime()) / (1000 * 60 * 60)) * 100;
-            const minTemperatureIndex = data.findIndex(item => item.temperature === minTemperature);
-            const maxTemperatureIndex = data.findIndex(item => item.temperature === maxTemperature);
+            const minTemperatureIndex = data.findIndex(
+              item => item.temperature === minTemperature,
+            );
+            const maxTemperatureIndex = data.findIndex(
+              item => item.temperature === maxTemperature,
+            );
             return (
               <g>
                 <defs>
