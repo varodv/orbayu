@@ -1,6 +1,6 @@
 import type { VariableWithValues } from '@openmeteo/sdk/variable-with-values';
 import type { VariablesWithTime } from '@openmeteo/sdk/variables-with-time';
-import { Unit } from '@openmeteo/sdk/unit';
+import type { Forecast } from '@/types/forecast';
 import { Variable } from '@openmeteo/sdk/variable';
 import { NextResponse } from 'next/server';
 import { fetchWeatherApi } from 'openmeteo';
@@ -34,27 +34,37 @@ export async function GET(request: Request) {
       longitude,
       ...(altitude && { elevation: altitude }),
       ...(timezone && { timezone }),
-      minutely_15: [
+      forecast_days: 1,
+      daily: [
+        'temperature_2m_mean',
+        'apparent_temperature_mean',
+        'precipitation_sum',
+        'precipitation_probability_mean',
+        'weather_code',
+        'uv_index_max',
+        'sunrise',
+        'sunset',
+      ],
+      hourly: [
         'temperature_2m',
         'apparent_temperature',
         'precipitation',
-        'wind_speed_10m',
+        'precipitation_probability',
         'weather_code',
+        'cloud_cover',
+        'wind_speed_10m',
         'relative_humidity_2m',
+        'visibility',
       ],
-      hourly: ['precipitation_probability', 'cloud_cover'],
-      daily: ['uv_index_max', 'sunrise', 'sunset'],
-      forecast_days: '1',
     };
     const [response] = await fetchWeatherApi(url, params);
 
-    const result = {
-      minutely_15: processVariablesWithTime(response.minutely15()!),
-      hourly: processVariablesWithTime(response.hourly()!),
-      daily: processVariablesWithTime(response.daily()!),
+    const forecast: Forecast = {
+      daily: processVariablesWithTime(response.daily()!) as Forecast['daily'],
+      hourly: processVariablesWithTime(response.hourly()!) as Forecast['hourly'],
     };
 
-    return NextResponse.json(result);
+    return NextResponse.json(forecast);
   }
   catch (error) {
     console.error(error);
@@ -66,7 +76,8 @@ function processVariablesWithTime(variables: VariablesWithTime) {
   return {
     time: Array.from(
       { length: (Number(variables.timeEnd()) - Number(variables.time())) / variables.interval() },
-      (_, index) => new Date((Number(variables.time()) + index * variables.interval()) * 1000),
+      (_, index) =>
+        new Date((Number(variables.time()) + index * variables.interval()) * 1000).toISOString(),
     ),
     ...Array.from({ length: variables.variablesLength() }).reduce<Record<string, any>>(
       (result, _, index) => {
@@ -85,13 +96,8 @@ function processVariablesWithTime(variables: VariablesWithTime) {
 function processVariableWithValues(variable: VariableWithValues) {
   const name = Variable[variable.variable()];
   if (name === 'sunrise' || name === 'sunset') {
-    return Array.from(
-      { length: variable.valuesInt64Length() },
-      (_, index) => new Date(Number(variable.valuesInt64(index)) * 1000),
-    );
+    return Array.from({ length: variable.valuesInt64Length() }, (_, index) =>
+      new Date(Number(variable.valuesInt64(index)) * 1000).toISOString());
   }
-  return {
-    unit: Unit[variable.unit()],
-    values: [...variable.valuesArray()!],
-  };
+  return [...variable.valuesArray()!];
 }
