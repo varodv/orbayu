@@ -54,7 +54,10 @@ export async function GET(request: Request) {
 
     if (!parsedQueryParams.success) {
       return NextResponse.json(
-        { error: 'Invalid parameters', details: z.flattenError(parsedQueryParams.error) },
+        {
+          error: 'Invalid parameters',
+          details: z.flattenError(parsedQueryParams.error).fieldErrors,
+        },
         { status: 400 },
       );
     }
@@ -71,19 +74,19 @@ export async function GET(request: Request) {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`BigDataCloud API error: ${response.statusText}`);
+      throw new Error('BigDataCloud API error', { cause: await response.json() });
     }
 
     const data = (await response.json()) as BigDataCloudReverseGeocodeResponse;
 
-    const location = {
+    const location: Location = {
       name: data.city || data.locality,
       region: data.principalSubdivision,
       country: data.countryName,
       countryCode: data.countryCode,
       latitude,
       longitude,
-    } as Location;
+    };
 
     return NextResponse.json(location);
   }

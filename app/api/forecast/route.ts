@@ -21,7 +21,10 @@ export async function GET(request: Request) {
 
     if (!parsedQueryParams.success) {
       return NextResponse.json(
-        { error: 'Invalid parameters', details: z.flattenError(parsedQueryParams.error) },
+        {
+          error: 'Invalid parameters',
+          details: z.flattenError(parsedQueryParams.error).fieldErrors,
+        },
         { status: 400 },
       );
     }
