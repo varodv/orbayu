@@ -7,4 +7,7 @@ export const MESSAGES_EN = {
   'location-picker.user.current': 'Use current location',
   'location-picker.user.permission.denied': 'Location permission denied',
   'location-picker.user.error': 'Error getting current location',
+
+  'forecast.temperature': 'Daily temperature',
+  'forecast.apparent_temperature': 'Apparent',
 };
