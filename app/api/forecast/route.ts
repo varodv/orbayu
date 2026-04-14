@@ -8,18 +8,22 @@ import { NextResponse } from 'next/server';
 import { fetchWeatherApi } from 'openmeteo';
 import { z } from 'zod';
 
+const DATE_TIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
 const queryParamsSchema = z.object({
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
   altitude: z.coerce.number().optional(),
-  timezone: z.string().optional(),
+  start_date: z.string().regex(DATE_TIME_REGEX),
+  end_date: z.string().regex(DATE_TIME_REGEX),
 });
 
 async function getCachedForecast({
   latitude,
   longitude,
   altitude,
-  timezone,
+  start_date,
+  end_date,
 }: z.infer<typeof queryParamsSchema>) {
   'use cache';
   cacheLife('hours');
@@ -29,8 +33,10 @@ async function getCachedForecast({
     latitude,
     longitude,
     ...(altitude && { elevation: altitude }),
-    ...(timezone && { timezone }),
-    forecast_days: 1,
+    start_date: start_date.split('T')[0],
+    end_date: end_date.split('T')[0],
+    start_hour: start_date,
+    end_hour: end_date,
     daily: [
       'temperature_2m_mean',
       'apparent_temperature_mean',
