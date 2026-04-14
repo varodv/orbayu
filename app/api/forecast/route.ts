@@ -1,7 +1,9 @@
 import type { VariableWithValues } from '@openmeteo/sdk/variable-with-values';
 import type { VariablesWithTime } from '@openmeteo/sdk/variables-with-time';
+import type { NextRequest } from 'next/server';
 import type { Forecast } from '@/types/forecast';
 import { Variable } from '@openmeteo/sdk/variable';
+import { cacheLife } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { fetchWeatherApi } from 'openmeteo';
 import { z } from 'zod';
@@ -13,10 +15,57 @@ const queryParamsSchema = z.object({
   timezone: z.string().optional(),
 });
 
-export async function GET(request: Request) {
+async function getCachedForecast({
+  latitude,
+  longitude,
+  altitude,
+  timezone,
+}: z.infer<typeof queryParamsSchema>) {
+  'use cache';
+  cacheLife('hours');
+
+  const url = 'https://api.open-meteo.com/v1/forecast';
+  const params = {
+    latitude,
+    longitude,
+    ...(altitude && { elevation: altitude }),
+    ...(timezone && { timezone }),
+    forecast_days: 1,
+    daily: [
+      'temperature_2m_mean',
+      'apparent_temperature_mean',
+      'precipitation_sum',
+      'precipitation_probability_mean',
+      'weather_code',
+      'uv_index_max',
+      'sunrise',
+      'sunset',
+    ],
+    hourly: [
+      'temperature_2m',
+      'apparent_temperature',
+      'precipitation',
+      'precipitation_probability',
+      'weather_code',
+      'cloud_cover',
+      'wind_speed_10m',
+      'relative_humidity_2m',
+      'visibility',
+    ],
+  };
+  const [response] = await fetchWeatherApi(url, params);
+
+  const result: Forecast = {
+    daily: processVariablesWithTime(response.daily()!) as Forecast['daily'],
+    hourly: processVariablesWithTime(response.hourly()!) as Forecast['hourly'],
+  };
+
+  return result;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const queryParams = Object.fromEntries(searchParams.entries());
+    const queryParams = Object.fromEntries(request.nextUrl.searchParams.entries());
     const parsedQueryParams = queryParamsSchema.safeParse(queryParams);
 
     if (!parsedQueryParams.success) {
@@ -29,43 +78,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const { latitude, longitude, altitude, timezone } = parsedQueryParams.data;
-
-    const url = 'https://api.open-meteo.com/v1/forecast';
-    const params = {
-      latitude,
-      longitude,
-      ...(altitude && { elevation: altitude }),
-      ...(timezone && { timezone }),
-      forecast_days: 1,
-      daily: [
-        'temperature_2m_mean',
-        'apparent_temperature_mean',
-        'precipitation_sum',
-        'precipitation_probability_mean',
-        'weather_code',
-        'uv_index_max',
-        'sunrise',
-        'sunset',
-      ],
-      hourly: [
-        'temperature_2m',
-        'apparent_temperature',
-        'precipitation',
-        'precipitation_probability',
-        'weather_code',
-        'cloud_cover',
-        'wind_speed_10m',
-        'relative_humidity_2m',
-        'visibility',
-      ],
-    };
-    const [response] = await fetchWeatherApi(url, params);
-
-    const forecast: Forecast = {
-      daily: processVariablesWithTime(response.daily()!) as Forecast['daily'],
-      hourly: processVariablesWithTime(response.hourly()!) as Forecast['hourly'],
-    };
+    const forecast = await getCachedForecast(parsedQueryParams.data);
 
     return NextResponse.json(forecast);
   }

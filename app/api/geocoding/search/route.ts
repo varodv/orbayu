@@ -1,3 +1,4 @@
+import type { NextRequest } from 'next/server';
 import type { Location } from '@/types/geocoding';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -33,10 +34,9 @@ const queryParamsSchema = z.object({
   limit: z.coerce.number().min(1).max(100).optional().default(10),
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const queryParams = Object.fromEntries(searchParams.entries());
+    const queryParams = Object.fromEntries(request.nextUrl.searchParams.entries());
     const parsedQueryParams = queryParamsSchema.safeParse(queryParams);
 
     if (!parsedQueryParams.success) {
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
     });
     const url = `https://geocoding-api.open-meteo.com/v1/search?${urlParams.toString()}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, { next: { revalidate: 60 * 60 * 24 } });
 
     if (!response.ok) {
       throw new Error('Open-Meteo API error', { cause: await response.json() });
