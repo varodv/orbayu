@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
     }
     catch (error) {
       console.error('Rate limit error:', error);
-      return NextResponse.next();
+      return NextResponse.json({ error: 'Rate limit error' }, { status: 500 });
     }
   }
 
