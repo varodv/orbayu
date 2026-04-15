@@ -1,3 +1,5 @@
+'use client';
+
 import type { Forecast } from '@/types/forecast';
 import { useQuery } from '@tanstack/react-query';
 import { fromZonedTime } from 'date-fns-tz';

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Geist } from 'next/font/google';
+import { Suspense } from 'react';
 import { Footer } from '@/components/footer';
 import { LocationContextProvider } from '@/context/location-context';
 import { cn } from '@/lib/utils';
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <IntlProvider>
             <QueryClientProvider>
               <LocationContextProvider>
-                <main className="flex-1">{children}</main>
+                <main className="flex-1">
+                  <Suspense>{children}</Suspense>
+                </main>
                 <Footer />
               </LocationContextProvider>
             </QueryClientProvider>
