@@ -29,11 +29,12 @@ export function useUserLocation() {
       if (!response.ok) {
         throw new Error('Failed to get user location');
       }
-      return {
-        ...(await response.json()),
-        altitude,
+      const result: Location = {
+        ...((await response.json()) as Omit<Location, 'timezone'>),
+        ...(altitude && { altitude }),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      } as Location;
+      };
+      return result;
     },
     retry: false,
   });

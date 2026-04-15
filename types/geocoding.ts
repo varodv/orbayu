@@ -7,5 +7,5 @@ export interface Location {
   latitude: number;
   longitude: number;
   altitude?: number;
-  timezone?: string;
+  timezone: string;
 }

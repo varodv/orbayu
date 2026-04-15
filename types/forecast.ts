@@ -1,17 +1,17 @@
-export interface Forecast {
+export interface Forecast<DateType extends string | Date> {
   daily: {
-    time: Array<string>;
+    time: Array<DateType>;
     temperature: Array<number>;
     apparent_temperature: Array<number>;
     precipitation: Array<number>;
     precipitation_probability: Array<number>;
     weather_code: Array<number>;
     uv_index: Array<number>;
-    sunrise: Array<string>;
-    sunset: Array<string>;
+    sunrise: Array<DateType>;
+    sunset: Array<DateType>;
   };
   hourly: {
-    time: Array<string>;
+    time: Array<DateType>;
     temperature: Array<number>;
     apparent_temperature: Array<number>;
     precipitation: Array<number>;

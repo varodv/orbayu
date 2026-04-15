@@ -61,9 +61,9 @@ async function getCachedForecast({
   };
   const [response] = await fetchWeatherApi(url, params);
 
-  const result: Forecast = {
-    daily: processVariablesWithTime(response.daily()!) as Forecast['daily'],
-    hourly: processVariablesWithTime(response.hourly()!) as Forecast['hourly'],
+  const result: Forecast<string> = {
+    daily: processVariablesWithTime(response.daily()!) as Forecast<string>['daily'],
+    hourly: processVariablesWithTime(response.hourly()!) as Forecast<string>['hourly'],
   };
 
   return result;
