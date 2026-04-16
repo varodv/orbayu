@@ -1,6 +1,6 @@
 'use client';
 
-import type { PropsWithChildren } from 'react';
+import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import type { Location } from '@/types/geocoding';
 import { createContext } from 'react';
 import { useStorage } from '@/hooks/use-storage';
@@ -9,7 +9,9 @@ interface LocationContextValue {
   current: Location | undefined;
 }
 
-export const LocationContext = createContext<ReturnType<typeof useStorage<LocationContextValue>>>([
+export const LocationContext = createContext<
+  [LocationContextValue, Dispatch<SetStateAction<LocationContextValue>>]
+>([
   {
     current: undefined,
   },
@@ -17,9 +19,13 @@ export const LocationContext = createContext<ReturnType<typeof useStorage<Locati
 ]);
 
 export function LocationContextProvider({ children }: PropsWithChildren) {
-  const value = useStorage<LocationContextValue>('orbayu:location', {
+  const [value, setValue, initialized] = useStorage<LocationContextValue>('orbayu:location', {
     current: undefined,
   });
 
-  return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
+  if (initialized) {
+    return (
+      <LocationContext.Provider value={[value, setValue]}>{children}</LocationContext.Provider>
+    );
+  }
 }

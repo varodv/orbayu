@@ -21,5 +21,5 @@ export function useStorage<ValueType>(key: string, initialValue: ValueType) {
     }
   }, [value, initialized]);
 
-  return [value, setValue] as const;
+  return [value, setValue, initialized] as const;
 }
