@@ -140,7 +140,9 @@ function UserLocationItem({ onSelect }: { onSelect: (location: Location) => void
     <CommandItem
       disabled={status === 'pending' || permission === 'denied'}
       onSelect={() => {
-        void check().then(location => location && onSelect(location)).catch(() => {});
+        void check()
+          .then(location => location && onSelect(location))
+          .catch(() => {});
       }}
     >
       {permission === 'denied'

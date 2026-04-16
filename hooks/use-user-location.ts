@@ -73,7 +73,9 @@ export function useUserLocation() {
       navigator.geolocation.getCurrentPosition(
         (newPosition) => {
           position.current = newPosition;
-          refetch({ throwOnError: true }).then(result => resolve(result.data)).catch(reject);
+          refetch({ throwOnError: true })
+            .then(result => resolve(result.data))
+            .catch(reject);
         },
         () => {
           position.current = undefined;
