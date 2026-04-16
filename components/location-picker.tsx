@@ -134,13 +134,13 @@ export function LocationPicker({ className, value, onChange }: Props) {
 function UserLocationItem({ onSelect }: { onSelect: (location: Location) => void }) {
   const { $t } = useIntl();
 
-  const { permission, status, data, check } = useUserLocation();
+  const { permission, status, check } = useUserLocation();
 
   return (
     <CommandItem
       disabled={status === 'pending' || permission === 'denied'}
       onSelect={() => {
-        void check().then(() => data && onSelect(data));
+        void check().then(location => location && onSelect(location)).catch(() => {});
       }}
     >
       {permission === 'denied'

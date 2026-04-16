@@ -2,23 +2,23 @@
 
 import type { Location } from '@/types/geocoding';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 export function useUserLocation() {
   const { locale } = useIntl();
 
+  const position = useRef<GeolocationPosition>(undefined);
+
   const [permission, setPermission] = useState<PermissionState>();
 
-  const [position, setPosition] = useState<GeolocationPosition>();
-
-  const { status, data, error } = useQuery({
-    queryKey: ['user-location', position],
+  const { status, fetchStatus, data, error, refetch } = useQuery({
+    queryKey: ['user-location'],
     queryFn: async () => {
-      if (!position) {
+      if (!position.current) {
         return null;
       }
-      const { latitude, longitude, altitude } = position.coords;
+      const { latitude, longitude, altitude } = position.current.coords;
       const urlParams = new URLSearchParams({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
@@ -36,18 +36,14 @@ export function useUserLocation() {
       };
       return result;
     },
+    enabled: false,
     retry: false,
   });
 
   useEffect(() => {
     void checkPermission();
+    void refetch();
   }, []);
-
-  useEffect(() => {
-    if (permission === 'granted') {
-      void checkPosition();
-    }
-  }, [permission]);
 
   async function checkPermission() {
     if (typeof navigator === 'undefined' || !navigator.permissions) {
@@ -67,24 +63,29 @@ export function useUserLocation() {
     }
   }
 
-  async function checkPosition() {
+  async function check() {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setPosition(undefined);
-      return;
+      position.current = undefined;
+      return undefined;
     }
 
-    navigator.geolocation.getCurrentPosition(setPosition, () => {
-      setPosition(undefined);
+    return new Promise<typeof data>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (newPosition) => {
+          position.current = newPosition;
+          refetch({ throwOnError: true }).then(result => resolve(result.data)).catch(reject);
+        },
+        () => {
+          position.current = undefined;
+          resolve(undefined);
+        },
+      );
     });
-  }
-
-  async function check() {
-    await checkPosition();
   }
 
   return {
     permission,
-    status,
+    status: fetchStatus === 'fetching' ? 'pending' : status,
     data,
     error,
     check,
