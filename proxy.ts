@@ -1,19 +1,25 @@
 import type { NextRequest } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { waitUntil } from '@vercel/functions';
 import { NextResponse } from 'next/server';
+
+const cache = new Map();
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(10, '10 s'),
   analytics: true,
+  enableProtection: true,
+  ephemeralCache: cache,
 });
 
 export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/')) {
     try {
       const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
-      const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+      const { success, limit, remaining, reset, pending } = await ratelimit.limit(ip);
+      waitUntil(pending);
       if (!success) {
         return NextResponse.json(
           { error: 'Too many requests' },
@@ -30,7 +36,7 @@ export async function proxy(request: NextRequest) {
     }
     catch (error) {
       console.error('Rate limit error:', error);
-      return NextResponse.json({ error: 'Rate limit error' }, { status: 500 });
+      return NextResponse.next();
     }
   }
 
