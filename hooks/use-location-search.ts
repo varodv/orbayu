@@ -17,7 +17,7 @@ export function useLocationSearch({ limit, debounce = 0 }: Props = {}) {
 
   const { status, data, error, refetch } = useQuery({
     queryKey: ['location-search', query],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const trimmedQuery = query.trim();
       if (trimmedQuery.length < 2) {
         return [];
@@ -28,7 +28,7 @@ export function useLocationSearch({ limit, debounce = 0 }: Props = {}) {
         ...(limit && { limit: limit.toString() }),
       });
       const url = `/api/geocoding/search?${urlParams.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       if (!response.ok) {
         throw new Error('Failed to search for locations');
       }

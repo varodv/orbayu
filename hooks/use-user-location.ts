@@ -14,7 +14,7 @@ export function useUserLocation() {
 
   const { status, fetchStatus, data, error, refetch } = useQuery({
     queryKey: ['user-location'],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!position.current) {
         return null;
       }
@@ -25,7 +25,7 @@ export function useUserLocation() {
         lang: locale,
       });
       const url = `/api/geocoding/reverse?${urlParams.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       if (!response.ok) {
         throw new Error('Failed to get user location');
       }

@@ -24,7 +24,7 @@ export function useForecast() {
 
   const { status, data, error } = useQuery({
     queryKey: ['forecast', location],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!location) {
         return null;
       }
@@ -38,7 +38,7 @@ export function useForecast() {
         end_date: endDate.toISOString().slice(0, 16),
       });
       const url = `/api/forecast?${urlParams.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
       if (!response.ok) {
         throw new Error('Failed to get forecast');
       }
