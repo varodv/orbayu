@@ -26,9 +26,9 @@ export function ForecastVariableChart({ className, data, domain, getColor, getLa
           dataKey="time"
           axisLine={false}
           tickLine={false}
-          tickFormatter={(value: Date, index) => {
+          tickFormatter={(_, index) => {
             if (index % 3 === 0) {
-              return value.getHours().toString();
+              return index.toString();
             }
             return '';
           }}

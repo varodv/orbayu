@@ -3,7 +3,8 @@ import type { Forecast } from '@/types/forecast';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
-type Variable = keyof Forecast<Date>['daily'] & keyof Forecast<Date>['hourly'];
+type Variable = keyof Forecast<Date>['daily'][number]
+  & keyof Forecast<Date>['daily'][number]['hourly'][number];
 
 interface Props<VariableType extends Variable> extends PropsWithChildren {
   className?: string;

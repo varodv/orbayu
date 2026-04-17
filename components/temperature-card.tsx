@@ -1,21 +1,17 @@
 import type { ComponentProps } from 'react';
+import type { Forecast } from '@/types/forecast';
 import { ThermometerSnowflakeIcon, ThermometerSunIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ForecastVariableCard } from './forecast-variable-card';
 import { ForecastVariableChart } from './forecast-variable-chart';
 
-const VARIABLES = ['temperature', 'apparent_temperature'] as const;
-
-type Variable = (typeof VARIABLES)[number];
-
 interface Props {
   className?: string;
-  data: {
-    daily: Record<Variable, number>;
-    hourly: Record<Variable, ComponentProps<typeof ForecastVariableChart>['data']>;
-  };
+  data: Forecast<Date>['daily'][number];
 }
+
+const VARIABLES = ['temperature', 'apparent_temperature'] as const;
 
 function getColor(value: number) {
   if (value < -10)
@@ -52,37 +48,36 @@ function getTitle(value: number) {
 export function TemperatureCard({ className, data }: Props) {
   const { $t } = useIntl();
 
-  const [selectedVariable, setSelectedVariable] = useState<Variable>('apparent_temperature');
+  const [selectedVariable, setSelectedVariable]
+    = useState<(typeof VARIABLES)[number]>('apparent_temperature');
 
   const minAbsoluteTemperature = useMemo(
-    () =>
-      Math.min(...VARIABLES.flatMap(variable => data.hourly[variable].map(item => item.value))),
+    () => Math.min(...VARIABLES.flatMap(variable => data.hourly.map(item => item[variable]))),
     [data],
   );
 
   const maxAbsoluteTemperature = useMemo(
-    () =>
-      Math.max(...VARIABLES.flatMap(variable => data.hourly[variable].map(item => item.value))),
+    () => Math.max(...VARIABLES.flatMap(variable => data.hourly.map(item => item[variable]))),
     [data],
   );
 
   const minSelectedTemperature = useMemo(
-    () => Math.min(...data.hourly[selectedVariable].map(item => item.value)),
+    () => Math.min(...data.hourly.map(item => item[selectedVariable])),
     [data, selectedVariable],
   );
 
   const maxSelectedTemperature = useMemo(
-    () => Math.max(...data.hourly[selectedVariable].map(item => item.value)),
+    () => Math.max(...data.hourly.map(item => item[selectedVariable])),
     [data, selectedVariable],
   );
 
   const minSelectedTemperatureIndex = useMemo(
-    () => data.hourly[selectedVariable].findIndex(item => item.value === minSelectedTemperature),
+    () => data.hourly.findIndex(item => item[selectedVariable] === minSelectedTemperature),
     [data, selectedVariable, minSelectedTemperature],
   );
 
   const maxSelectedTemperatureIndex = useMemo(
-    () => data.hourly[selectedVariable].findIndex(item => item.value === maxSelectedTemperature),
+    () => data.hourly.findIndex(item => item[selectedVariable] === maxSelectedTemperature),
     [data, selectedVariable, maxSelectedTemperature],
   );
 
@@ -109,8 +104,8 @@ export function TemperatureCard({ className, data }: Props) {
       className={className}
       variables={VARIABLES.map(variable => ({
         key: variable,
-        icon: getIcon(data.daily[variable]),
-        title: getTitle(data.daily[variable]),
+        icon: getIcon(data[variable]),
+        title: getTitle(data[variable]),
         description: $t({ id: `forecast.${variable}` }),
       }))}
       selectedVariable={selectedVariable}
@@ -118,7 +113,10 @@ export function TemperatureCard({ className, data }: Props) {
     >
       <ForecastVariableChart
         className="h-30 -mx-2"
-        data={data.hourly[selectedVariable]}
+        data={data.hourly.map(item => ({
+          ...item,
+          value: item[selectedVariable],
+        }))}
         domain={chartDomain}
         getColor={item => getColor(item.value)}
         getLabel={getChartLabel}

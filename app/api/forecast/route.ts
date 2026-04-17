@@ -8,14 +8,15 @@ import { NextResponse } from 'next/server';
 import { fetchWeatherApi } from 'openmeteo';
 import { z } from 'zod';
 
-const DATE_TIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 const queryParamsSchema = z.object({
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
   altitude: z.coerce.number().optional(),
-  start_date: z.string().regex(DATE_TIME_REGEX),
-  end_date: z.string().regex(DATE_TIME_REGEX),
+  start_date: z.string().regex(DATE_REGEX),
+  end_date: z.string().regex(DATE_REGEX),
+  timezone: z.string().optional(),
 });
 
 async function getCachedForecast({
@@ -24,6 +25,7 @@ async function getCachedForecast({
   altitude,
   start_date,
   end_date,
+  timezone,
 }: z.infer<typeof queryParamsSchema>) {
   'use cache';
   cacheLife('hours');
@@ -33,10 +35,11 @@ async function getCachedForecast({
     latitude,
     longitude,
     ...(altitude && { elevation: altitude }),
-    start_date: start_date.split('T')[0],
-    end_date: end_date.split('T')[0],
-    start_hour: start_date,
-    end_hour: end_date,
+    start_date,
+    end_date,
+    start_hour: `${start_date}T00:00`,
+    end_hour: `${end_date}T23:00`,
+    ...(timezone && { timezone }),
     daily: [
       'temperature_2m_mean',
       'apparent_temperature_mean',
@@ -61,9 +64,23 @@ async function getCachedForecast({
   };
   const [response] = await fetchWeatherApi(url, params);
 
+  const utcOffsetSeconds = response.utcOffsetSeconds();
+  const dailyResult = processVariablesWithTime(
+    response.daily()!,
+    utcOffsetSeconds,
+  ) as unknown as Omit<Forecast<string>['daily'], 'hourly'>;
+  const hourlyResult = processVariablesWithTime(
+    response.hourly()!,
+    utcOffsetSeconds,
+  ) as Forecast<string>['daily'][number]['hourly'];
   const result: Forecast<string> = {
-    daily: processVariablesWithTime(response.daily()!) as Forecast<string>['daily'],
-    hourly: processVariablesWithTime(response.hourly()!) as Forecast<string>['hourly'],
+    daily: dailyResult.map((dailyItem) => {
+      const itemDate = dailyItem.time.split('T')[0];
+      return {
+        ...dailyItem,
+        hourly: hourlyResult.filter(hourlyItem => hourlyItem.time.startsWith(itemDate)),
+      };
+    }),
   };
 
   return result;
@@ -94,32 +111,61 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function processVariablesWithTime(variables: VariablesWithTime) {
-  return {
-    time: Array.from(
-      { length: (Number(variables.timeEnd()) - Number(variables.time())) / variables.interval() },
-      (_, index) =>
-        new Date((Number(variables.time()) + index * variables.interval()) * 1000).toISOString(),
-    ),
-    ...Array.from({ length: variables.variablesLength() }).reduce<Record<string, any>>(
-      (result, _, index) => {
-        const variable = variables.variables(index)!;
-        const name = Variable[variable.variable()];
-        return {
-          ...result,
-          [name]: processVariableWithValues(variable),
-        };
+function processVariablesWithTime(variables: VariablesWithTime, utcOffsetSeconds: number) {
+  const times = Array.from(
+    { length: (Number(variables.timeEnd()) - Number(variables.time())) / variables.interval() },
+    (_, index) => {
+      const time = new Date(
+        (Number(variables.time()) + index * variables.interval() + utcOffsetSeconds) * 1000,
+      );
+      return toISOTimezoneString(time, utcOffsetSeconds);
+    },
+  );
+
+  const columns = Array.from({ length: variables.variablesLength() }).map((_, index) => {
+    const variable = variables.variables(index)!;
+    const name = Variable[variable.variable()];
+    return {
+      name,
+      values: processVariableWithValues(variable, utcOffsetSeconds),
+    };
+  });
+
+  return times.reduce<Array<Record<string, number | string>>>(
+    (result, time, index) => [
+      ...result,
+      {
+        time,
+        ...columns.reduce(
+          (currentResult, column) => ({
+            ...currentResult,
+            [column.name]: column.values[index],
+          }),
+          {},
+        ),
       },
-      {},
-    ),
-  };
+    ],
+    [],
+  );
 }
 
-function processVariableWithValues(variable: VariableWithValues) {
+function toISOTimezoneString(date: Date, utcOffsetSeconds: number) {
+  const utcOffsetHours = Math.floor(utcOffsetSeconds / 3600);
+  const utcOffsetMinutes = Math.floor((utcOffsetSeconds % 3600) / 60);
+  const utcOffsetHoursString = utcOffsetHours.toString().padStart(2, '0');
+  const utcOffsetMinutesString = utcOffsetMinutes.toString().padStart(2, '0');
+  const utcOffsetSign = utcOffsetSeconds >= 0 ? '+' : '-';
+  const utcOffsetString = `${utcOffsetSign}${utcOffsetHoursString}:${utcOffsetMinutesString}`;
+  return date.toISOString().replace('Z', utcOffsetString);
+}
+
+function processVariableWithValues(variable: VariableWithValues, utcOffsetSeconds: number) {
   const name = Variable[variable.variable()];
   if (name === 'sunrise' || name === 'sunset') {
-    return Array.from({ length: variable.valuesInt64Length() }, (_, index) =>
-      new Date(Number(variable.valuesInt64(index)) * 1000).toISOString());
+    return Array.from({ length: variable.valuesInt64Length() }, (_, index) => {
+      const time = new Date((Number(variable.valuesInt64(index)) + utcOffsetSeconds) * 1000);
+      return toISOTimezoneString(time, utcOffsetSeconds);
+    });
   }
   return [...variable.valuesArray()!];
 }
