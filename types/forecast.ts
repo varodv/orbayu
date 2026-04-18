@@ -5,6 +5,7 @@ export interface Forecast<DateType extends string | Date> {
     apparent_temperature: number;
     precipitation: number;
     precipitation_probability: number;
+    snowfall: number;
     weather_code: number;
     uv_index: number;
     sunrise: DateType;
@@ -15,6 +16,7 @@ export interface Forecast<DateType extends string | Date> {
       apparent_temperature: number;
       precipitation: number;
       precipitation_probability: number;
+      snowfall: number;
       weather_code: number;
       cloud_cover: number;
       wind_speed: number;

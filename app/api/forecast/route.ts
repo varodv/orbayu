@@ -45,6 +45,7 @@ async function getCachedForecast({
       'apparent_temperature_mean',
       'precipitation_sum',
       'precipitation_probability_mean',
+      'snowfall_sum',
       'weather_code',
       'uv_index_max',
       'sunrise',
@@ -55,6 +56,7 @@ async function getCachedForecast({
       'apparent_temperature',
       'precipitation',
       'precipitation_probability',
+      'snowfall',
       'weather_code',
       'cloud_cover',
       'wind_speed_10m',
@@ -167,5 +169,5 @@ function processVariableWithValues(variable: VariableWithValues, utcOffsetSecond
       return toISOTimezoneString(time, utcOffsetSeconds);
     });
   }
-  return [...variable.valuesArray()!];
+  return Array.from(variable.valuesArray()!);
 }
