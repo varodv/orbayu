@@ -1,10 +1,9 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import type { Forecast } from '@/types/forecast';
+import type { DailyWeather, HourlyWeather } from '@/types/forecast';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
-type Variable = keyof Forecast<Date>['daily'][number]
-  & keyof Forecast<Date>['daily'][number]['hourly'][number];
+type Variable = keyof DailyWeather<Date> & keyof HourlyWeather<Date>;
 
 interface Props<VariableType extends Variable> extends PropsWithChildren {
   className?: string;

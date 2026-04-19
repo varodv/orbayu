@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import type { Forecast } from '@/types/forecast';
+import type { DailyWeather } from '@/types/forecast';
 import { ThermometerSnowflakeIcon, ThermometerSunIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import { ForecastVariableChart } from './forecast-variable-chart';
 
 interface Props {
   className?: string;
-  data: Forecast<Date>['daily'][number];
+  data: DailyWeather<Date>;
 }
 
 const VARIABLES = ['temperature', 'apparent_temperature'] as const;
