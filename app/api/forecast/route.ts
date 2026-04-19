@@ -1,7 +1,7 @@
 import type { VariableWithValues } from '@openmeteo/sdk/variable-with-values';
 import type { VariablesWithTime } from '@openmeteo/sdk/variables-with-time';
 import type { NextRequest } from 'next/server';
-import type { DailyWeather, Forecast, HourlyWeather } from '@/types/forecast';
+import type { DailyForecast, Forecast, HourlyForecast } from '@/types/forecast';
 import { Variable } from '@openmeteo/sdk/variable';
 import { cacheLife } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -70,11 +70,11 @@ async function getCachedForecast({
   const dailyResult = processVariablesWithTime(
     response.daily()!,
     utcOffsetSeconds,
-  ) as unknown as Array<Omit<DailyWeather<string>, 'hourly'>>;
+  ) as unknown as Array<Omit<DailyForecast<string>, 'hourly'>>;
   const hourlyResult = processVariablesWithTime(
     response.hourly()!,
     utcOffsetSeconds,
-  ) as unknown as Array<HourlyWeather<string>>;
+  ) as unknown as Array<HourlyForecast<string>>;
   const result: Forecast<string> = {
     daily: dailyResult.map((dailyItem) => {
       const itemDate = dailyItem.time.split('T')[0];

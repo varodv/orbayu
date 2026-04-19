@@ -1,8 +1,8 @@
 export interface Forecast<DateType extends string | Date> {
-  daily: Array<DailyWeather<DateType>>;
+  daily: Array<DailyForecast<DateType>>;
 }
 
-export interface DailyWeather<DateType extends string | Date> {
+export interface DailyForecast<DateType extends string | Date> {
   time: DateType;
   temperature: number;
   apparent_temperature: number;
@@ -13,10 +13,10 @@ export interface DailyWeather<DateType extends string | Date> {
   uv_index: number;
   sunrise: DateType;
   sunset: DateType;
-  hourly: Array<HourlyWeather<DateType>>;
+  hourly: Array<HourlyForecast<DateType>>;
 }
 
-export interface HourlyWeather<DateType extends string | Date> {
+export interface HourlyForecast<DateType extends string | Date> {
   time: DateType;
   temperature: number;
   apparent_temperature: number;
