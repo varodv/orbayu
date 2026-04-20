@@ -6,6 +6,7 @@ import { TemperatureCard } from '@/components/temperature-card';
 import { useForecast } from '@/hooks/use-forecast';
 import { useLocation } from '@/hooks/use-location';
 import { computeForecast } from '@/lib/forecast';
+import { getOutfit } from '@/lib/outfit';
 
 export default function Home() {
   const { location, setLocation } = useLocation();
@@ -17,6 +18,12 @@ export default function Home() {
       return computeForecast(data.daily[0]);
     }
   }, [data]);
+
+  const outfit = useMemo(() => {
+    if (computedForecast) {
+      return getOutfit(computedForecast);
+    }
+  }, [computedForecast]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -33,6 +40,7 @@ export default function Home() {
           : (
               <>
                 <TemperatureCard data={data.daily[0]} />
+                <pre className="overflow-x-auto text-sm">{JSON.stringify(outfit, null, 2)}</pre>
                 <pre className="overflow-x-auto text-sm">
                   {JSON.stringify(computedForecast, null, 2)}
                 </pre>
