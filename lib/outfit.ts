@@ -1,13 +1,4 @@
-import type {
-  ComputedForecast,
-  PRECIPITATION_PROBABILITY_SCALE,
-  PRECIPITATION_SCALE,
-  SNOWFALL_SCALE,
-  TEMPERATURE_DELTA_SCALE,
-  TEMPERATURE_SCALE,
-  UV_INDEX_SCALE,
-  WIND_SPEED_SCALE,
-} from '@/lib/forecast';
+import type { ComputedForecast } from '@/types/forecast';
 import type { Outfit } from '@/types/outfit';
 
 interface ConditionedOutfitItem<KeyType extends OutfitItem = OutfitItem> {
@@ -25,25 +16,25 @@ type ANDCondition = Array<Condition>;
 
 type Condition = | {
   variable: 'temperature';
-  ranges: Array<keyof typeof TEMPERATURE_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['temperature']['range']>;
 } | {
   variable: 'temperature_delta';
-  ranges: Array<keyof typeof TEMPERATURE_DELTA_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['temperature_delta']['range']>;
 } | {
   variable: 'precipitation';
-  ranges: Array<keyof typeof PRECIPITATION_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['precipitation']['range']>;
 } | {
   variable: 'precipitation_probability';
-  ranges: Array<keyof typeof PRECIPITATION_PROBABILITY_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['precipitation_probability']['range']>;
 } | {
   variable: 'snowfall';
-  ranges: Array<keyof typeof SNOWFALL_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['snowfall']['range']>;
 } | {
   variable: 'wind_speed';
-  ranges: Array<keyof typeof WIND_SPEED_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['wind_speed']['range']>;
 } | {
   variable: 'uv_index';
-  ranges: Array<keyof typeof UV_INDEX_SCALE>;
+  ranges: Array<ComputedForecast<string | Date>['uv_index']['range']>;
 };
 
 const RAINY_CONDITION: ANDCondition = [
@@ -361,7 +352,9 @@ const CONDITIONED_ACCESSORIES: Array<ConditionedOutfitItem<Outfit['accessories']
   },
 ];
 
-export function getOutfit(data: ComputedForecast): Outfit {
+export function getOutfit<DateType extends string | Date>(
+  data: ComputedForecast<DateType>,
+): Outfit {
   return {
     baseLayer: getBaseLayer(data),
     midLayer: getMidLayer(data),
@@ -372,12 +365,12 @@ export function getOutfit(data: ComputedForecast): Outfit {
   };
 }
 
-function getBaseLayer(data: ComputedForecast) {
+function getBaseLayer<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_BASE_LAYERS)[0];
 }
 
-function getMatchingOutfitItems<KeyType extends OutfitItem = OutfitItem>(
-  data: ComputedForecast,
+function getMatchingOutfitItems<DateType extends string | Date, KeyType extends OutfitItem>(
+  data: ComputedForecast<DateType>,
   conditionedOutfitItems: Array<ConditionedOutfitItem<KeyType>>,
 ) {
   return conditionedOutfitItems
@@ -391,22 +384,22 @@ function getMatchingOutfitItems<KeyType extends OutfitItem = OutfitItem>(
     .map(({ key }) => key);
 }
 
-function getMidLayer(data: ComputedForecast) {
+function getMidLayer<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_MID_LAYERS)[0];
 }
 
-function getOuterwear(data: ComputedForecast) {
+function getOuterwear<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_OUTERWEAR)[0];
 }
 
-function getBottom(data: ComputedForecast) {
+function getBottom<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_BOTTOMS)[0];
 }
 
-function getFootwear(data: ComputedForecast) {
+function getFootwear<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_FOOTWEAR)[0];
 }
 
-function getAccessories(data: ComputedForecast) {
+function getAccessories<DateType extends string | Date>(data: ComputedForecast<DateType>) {
   return getMatchingOutfitItems(data, CONDITIONED_ACCESSORIES);
 }

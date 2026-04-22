@@ -1,35 +1,4 @@
-import type { DailyForecast } from '@/types/forecast';
-
-export interface ComputedForecast {
-  temperature: {
-    value: number;
-    range: keyof typeof TEMPERATURE_SCALE;
-  };
-  temperature_delta: {
-    value: number;
-    range: keyof typeof TEMPERATURE_DELTA_SCALE;
-  };
-  precipitation: {
-    value: number;
-    range: keyof typeof PRECIPITATION_SCALE;
-  };
-  precipitation_probability: {
-    value: number;
-    range: keyof typeof PRECIPITATION_PROBABILITY_SCALE;
-  };
-  snowfall: {
-    value: number;
-    range: keyof typeof SNOWFALL_SCALE;
-  };
-  wind_speed: {
-    value: number;
-    range: keyof typeof WIND_SPEED_SCALE;
-  };
-  uv_index: {
-    value: number;
-    range: keyof typeof UV_INDEX_SCALE;
-  };
-}
+import type { ComputedForecast, DailyForecast } from '@/types/forecast';
 
 type Scale = Record<string, [number, number]>;
 
@@ -94,8 +63,11 @@ export const UV_INDEX_SCALE = {
   EXTREME: [11, Infinity],
 } satisfies Scale;
 
-export function computeForecast(data: DailyForecast<string | Date>): ComputedForecast {
+export function computeForecast<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType> {
   return {
+    time: data.time,
     temperature: computeTemperature(data),
     temperature_delta: computeTemperatureDelta(data),
     precipitation: computePrecipitation(data),
@@ -106,7 +78,9 @@ export function computeForecast(data: DailyForecast<string | Date>): ComputedFor
   };
 }
 
-function computeTemperature(data: DailyForecast<string | Date>): ComputedForecast['temperature'] {
+function computeTemperature<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['temperature'] {
   const meanTemperature
     = data.hourly.reduce((result, item) => result + item.apparent_temperature, 0)
       / data.hourly.length;
@@ -122,9 +96,9 @@ function getRange<ScaleType extends Scale>(value: number, scale: ScaleType) {
   )?.[0] as keyof ScaleType;
 }
 
-function computeTemperatureDelta(
-  data: DailyForecast<string | Date>,
-): ComputedForecast['temperature_delta'] {
+function computeTemperatureDelta<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['temperature_delta'] {
   const minTemperature = Math.min(...data.hourly.map(item => item.apparent_temperature));
   const maxTemperature = Math.max(...data.hourly.map(item => item.apparent_temperature));
   const temperatureDelta = maxTemperature - minTemperature;
@@ -134,9 +108,9 @@ function computeTemperatureDelta(
   };
 }
 
-function computePrecipitation(
-  data: DailyForecast<string | Date>,
-): ComputedForecast['precipitation'] {
+function computePrecipitation<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['precipitation'] {
   const maxPrecipitation = Math.max(...data.hourly.map(item => item.precipitation));
   return {
     value: maxPrecipitation,
@@ -144,9 +118,9 @@ function computePrecipitation(
   };
 }
 
-function computePrecipitationProbability(
-  data: DailyForecast<string | Date>,
-): ComputedForecast['precipitation_probability'] {
+function computePrecipitationProbability<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['precipitation_probability'] {
   const maxPrecipitationProbability = Math.max(
     ...data.hourly.map(item => item.precipitation_probability),
   );
@@ -156,7 +130,9 @@ function computePrecipitationProbability(
   };
 }
 
-function computeSnowfall(data: DailyForecast<string | Date>): ComputedForecast['snowfall'] {
+function computeSnowfall<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['snowfall'] {
   const maxSnowfall = Math.max(...data.hourly.map(item => item.snowfall));
   return {
     value: maxSnowfall,
@@ -164,7 +140,9 @@ function computeSnowfall(data: DailyForecast<string | Date>): ComputedForecast['
   };
 }
 
-function computeWindSpeed(data: DailyForecast<string | Date>): ComputedForecast['wind_speed'] {
+function computeWindSpeed<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['wind_speed'] {
   const maxWindSpeed = Math.max(...data.hourly.map(item => item.wind_speed));
   return {
     value: maxWindSpeed,
@@ -172,7 +150,9 @@ function computeWindSpeed(data: DailyForecast<string | Date>): ComputedForecast[
   };
 }
 
-function computeUVIndex(data: DailyForecast<string | Date>): ComputedForecast['uv_index'] {
+function computeUVIndex<DateType extends string | Date>(
+  data: DailyForecast<DateType>,
+): ComputedForecast<DateType>['uv_index'] {
   return {
     value: data.uv_index,
     range: getRange(data.uv_index, UV_INDEX_SCALE),
