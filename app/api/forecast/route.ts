@@ -154,8 +154,8 @@ function processVariablesWithTime(variables: VariablesWithTime, utcOffsetSeconds
 function toISOTimezoneString(date: Date, utcOffsetSeconds: number) {
   const utcOffsetHours = Math.floor(utcOffsetSeconds / 3600);
   const utcOffsetMinutes = Math.floor((utcOffsetSeconds % 3600) / 60);
-  const utcOffsetHoursString = utcOffsetHours.toString().padStart(2, '0');
-  const utcOffsetMinutesString = utcOffsetMinutes.toString().padStart(2, '0');
+  const utcOffsetHoursString = Math.abs(utcOffsetHours).toString().padStart(2, '0');
+  const utcOffsetMinutesString = Math.abs(utcOffsetMinutes).toString().padStart(2, '0');
   const utcOffsetSign = utcOffsetSeconds >= 0 ? '+' : '-';
   const utcOffsetString = `${utcOffsetSign}${utcOffsetHoursString}:${utcOffsetMinutesString}`;
   return date.toISOString().replace('Z', utcOffsetString);
