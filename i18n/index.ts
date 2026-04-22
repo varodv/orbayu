@@ -10,4 +10,9 @@ export const MESSAGES_EN = {
 
   'forecast.temperature': 'Daily temperature',
   'forecast.apparent_temperature': 'Apparent',
+
+  'outfit.top': 'Top',
+  'outfit.bottom': 'Bottom',
+  'outfit.footwear': 'Footwear',
+  'outfit.accessories': 'Accessories',
 };

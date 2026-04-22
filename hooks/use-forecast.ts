@@ -2,6 +2,8 @@
 
 import type { Forecast } from '@/types/forecast';
 import { useQuery } from '@tanstack/react-query';
+import { addDays } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { useLocation } from './use-location';
 
 export function useForecast() {
@@ -14,14 +16,12 @@ export function useForecast() {
         return null;
       }
       const { latitude, longitude, altitude, timezone } = location;
-      const today = new Date();
-      today.setUTCHours(0, 0, 0, 0);
       const urlParams = new URLSearchParams({
         latitude: latitude.toString(),
         longitude: longitude.toString(),
         ...(altitude && { altitude: altitude.toString() }),
-        start_date: today.toISOString().split('T')[0],
-        end_date: today.toISOString().split('T')[0],
+        start_date: formatInTimeZone(new Date(), timezone, 'yyyy-MM-dd'),
+        end_date: formatInTimeZone(addDays(new Date(), 6), timezone, 'yyyy-MM-dd'),
         ...(timezone && { timezone }),
       });
       const url = `/api/forecast?${urlParams.toString()}`;

@@ -1,29 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { DailyForecastCard } from '@/components/daily-forecast-card';
 import { LocationPicker } from '@/components/location-picker';
-import { TemperatureCard } from '@/components/temperature-card';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { useForecast } from '@/hooks/use-forecast';
 import { useLocation } from '@/hooks/use-location';
-import { computeForecast } from '@/lib/forecast';
-import { getOutfit } from '@/lib/outfit';
 
 export default function Home() {
   const { location, setLocation } = useLocation();
 
   const { status, data, error } = useForecast();
-
-  const computedForecast = useMemo(() => {
-    if (data?.daily.length) {
-      return computeForecast(data.daily[0]);
-    }
-  }, [data]);
-
-  const outfit = useMemo(() => {
-    if (computedForecast) {
-      return getOutfit(computedForecast);
-    }
-  }, [computedForecast]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -38,13 +24,15 @@ export default function Home() {
               <p className="text-center">No forecast data</p>
             )
           : (
-              <>
-                <TemperatureCard data={data.daily[0]} />
-                <pre className="overflow-x-auto text-sm">{JSON.stringify(outfit, null, 2)}</pre>
-                <pre className="overflow-x-auto text-sm">
-                  {JSON.stringify(computedForecast, null, 2)}
-                </pre>
-              </>
+              <Carousel>
+                <CarouselContent>
+                  {data.daily.map(item => (
+                    <CarouselItem key={item.time.toISOString()}>
+                      <DailyForecastCard data={item} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             ))}
     </div>
   );
