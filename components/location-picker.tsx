@@ -51,8 +51,9 @@ export function LocationPicker({ className, value, onChange }: Props) {
   return (
     <>
       <Button
-        className={cn('min-w-30', className)}
-        variant={!value ? 'destructive' : 'ghost'}
+        className={cn('min-w-40', className)}
+        variant={!value ? 'destructive' : 'outline'}
+        size="lg"
         onClick={() => setOpen(true)}
       >
         <MapPinIcon className="size-5" />

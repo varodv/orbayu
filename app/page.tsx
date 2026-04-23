@@ -12,7 +12,7 @@ export default function Home() {
   const { status, data, error } = useForecast();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 flex-1">
       <LocationPicker className="self-center" value={location} onChange={setLocation} />
       {status === 'pending' && <p className="text-center">Loading...</p>}
       {status === 'error' && (
@@ -24,11 +24,11 @@ export default function Home() {
               <p className="text-center">No forecast data</p>
             )
           : (
-              <Carousel>
+              <Carousel className="flex flex-1">
                 <CarouselContent>
                   {data.daily.map(item => (
                     <CarouselItem key={item.time.toISOString()}>
-                      <DailyForecastCard data={item} />
+                      <DailyForecastCard className="h-full" data={item} />
                     </CarouselItem>
                   ))}
                 </CarouselContent>

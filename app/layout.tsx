@@ -36,7 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <IntlProvider>
             <QueryClientProvider>
               <LocationContextProvider>
-                <main className="flex-1">
+                <main className="flex flex-col flex-1">
                   <Suspense>{children}</Suspense>
                 </main>
                 <Footer />
