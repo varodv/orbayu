@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function DailyForecastCard({ className, data }: Props) {
-  const { $t } = useIntl();
+  const { $t, formatDate } = useIntl();
 
   const computedData = useMemo(() => {
     return computeForecast(data);
@@ -24,13 +24,22 @@ export function DailyForecastCard({ className, data }: Props) {
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-center">{computedData.time.toISOString()}</CardTitle>
+        <CardTitle className="text-center">
+          {formatDate(computedData.time, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long',
+          })}
+        </CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4 text-center">
         <div className="flex flex-col gap-1">
           <p className="uppercase">
             [
+            {' '}
             {$t({ id: 'outfit.top' })}
+            {' '}
             ]
           </p>
           {outfit.outerwear && <p>{outfit.outerwear}</p>}
@@ -40,7 +49,9 @@ export function DailyForecastCard({ className, data }: Props) {
         <div className="flex flex-col gap-1 row-span-3">
           <p className="uppercase">
             [
+            {' '}
             {$t({ id: 'outfit.accessories' })}
+            {' '}
             ]
           </p>
           {outfit.accessories.map(item => (
@@ -50,7 +61,9 @@ export function DailyForecastCard({ className, data }: Props) {
         <div className="flex flex-col gap-1">
           <p className="uppercase">
             [
+            {' '}
             {$t({ id: 'outfit.bottom' })}
+            {' '}
             ]
           </p>
           <p>{outfit.bottom}</p>
@@ -58,7 +71,9 @@ export function DailyForecastCard({ className, data }: Props) {
         <div className="flex flex-col gap-1">
           <p className="uppercase">
             [
+            {' '}
             {$t({ id: 'outfit.footwear' })}
+            {' '}
             ]
           </p>
           <p>{outfit.footwear}</p>

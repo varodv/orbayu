@@ -4,6 +4,7 @@ import type { Forecast } from '@/types/forecast';
 import { useQuery } from '@tanstack/react-query';
 import { addDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
+import { convertToLocalDate } from '@/lib/date';
 import { useLocation } from './use-location';
 
 export function useForecast() {
@@ -33,12 +34,12 @@ export function useForecast() {
       const result: Forecast<Date> = {
         daily: forecast.daily.map(dailyItem => ({
           ...dailyItem,
-          time: new Date(dailyItem.time),
-          sunrise: new Date(dailyItem.sunrise),
-          sunset: new Date(dailyItem.sunset),
+          time: convertToLocalDate(dailyItem.time, timezone),
+          sunrise: convertToLocalDate(dailyItem.sunrise, timezone),
+          sunset: convertToLocalDate(dailyItem.sunset, timezone),
           hourly: dailyItem.hourly.map(hourlyItem => ({
             ...hourlyItem,
-            time: new Date(hourlyItem.time),
+            time: convertToLocalDate(hourlyItem.time, timezone),
           })),
         })),
       };
