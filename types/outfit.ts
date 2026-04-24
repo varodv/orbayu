@@ -1,10 +1,17 @@
+import type { ComputedForecast } from './forecast';
+
 export interface Outfit {
-  baseLayer: BaseLayer;
-  midLayer?: MidLayer;
-  outerwear?: Outerwear;
-  bottom: Bottom;
-  footwear: Footwear;
-  accessories: Array<Accessory>;
+  baseLayer: OutfitItem<BaseLayer>;
+  midLayer?: OutfitItem<MidLayer>;
+  outerwear?: OutfitItem<Outerwear>;
+  bottom: OutfitItem<Bottom>;
+  footwear: OutfitItem<Footwear>;
+  accessories: Array<OutfitItem<Accessory>>;
+}
+
+export interface OutfitItem<KeyType extends string> {
+  key: KeyType;
+  variables: Array<Exclude<keyof ComputedForecast<string | Date>, 'time'>>;
 }
 
 type BaseLayer = 'thermal-top' | 'long-sleeve' | 't-shirt' | 'tank-top';

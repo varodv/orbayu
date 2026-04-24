@@ -1,14 +1,10 @@
 import type { ComputedForecast } from '@/types/forecast';
-import type { Outfit } from '@/types/outfit';
+import type { Outfit, OutfitItem } from '@/types/outfit';
 
-interface ConditionedOutfitItem<KeyType extends OutfitItem = OutfitItem> {
-  key: KeyType;
+interface ConditionedOutfitItem<Type extends OutfitItem<string>> {
+  key: Type['key'];
   when: ORCondition;
 }
-
-type OutfitItem
-  = | Exclude<Outfit[Exclude<keyof Outfit, 'accessories'>], undefined>
-    | Outfit['accessories'][number];
 
 type ORCondition = Array<ANDCondition>;
 
@@ -369,19 +365,31 @@ function getBaseLayer<DateType extends string | Date>(data: ComputedForecast<Dat
   return getMatchingOutfitItems(data, CONDITIONED_BASE_LAYERS)[0];
 }
 
-function getMatchingOutfitItems<DateType extends string | Date, KeyType extends OutfitItem>(
+function getMatchingOutfitItems<DateType extends string | Date, Type extends OutfitItem<string>>(
   data: ComputedForecast<DateType>,
-  conditionedOutfitItems: Array<ConditionedOutfitItem<KeyType>>,
+  conditionedOutfitItems: Array<ConditionedOutfitItem<Type>>,
 ) {
-  return conditionedOutfitItems
-    .filter(({ when }) =>
-      when.some(conditions =>
-        conditions.every(condition =>
-          (condition.ranges as Array<string>).includes(data[condition.variable].range),
-        ),
+  return conditionedOutfitItems.reduce<Array<Type>>((result, item) => {
+    const matchingConditions = item.when.filter(conditions =>
+      conditions.every(condition =>
+        (condition.ranges as Array<string>).includes(data[condition.variable].range),
       ),
-    )
-    .map(({ key }) => key);
+    );
+    if (matchingConditions.length) {
+      const variables = Array.from(
+        new Set(
+          matchingConditions.flatMap(conditions =>
+            conditions.map(currentCondition => currentCondition.variable),
+          ),
+        ),
+      );
+      result.push({
+        key: item.key,
+        variables,
+      } as Type);
+    }
+    return result;
+  }, []);
 }
 
 function getMidLayer<DateType extends string | Date>(data: ComputedForecast<DateType>) {
