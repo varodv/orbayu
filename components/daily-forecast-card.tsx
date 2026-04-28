@@ -4,7 +4,8 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { computeForecast } from '@/lib/forecast';
 import { getOutfit } from '@/lib/outfit';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { WeatherCodeIcon } from './weather-code-icon';
 
 interface Props {
   className?: string;
@@ -57,6 +58,10 @@ export function DailyForecastCard({ className, data }: Props) {
             weekday: 'long',
           })}
         </CardTitle>
+        <CardDescription className="flex items-center justify-center gap-1">
+          <WeatherCodeIcon className="size-8" value={data.weather_code} />
+          {$t({ id: `forecast.weather_code.${data.weather_code}` })}
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4 text-center">
         <div className="col-span-2">
