@@ -40,6 +40,9 @@ export const MESSAGES_EN = {
   'forecast.weather_code.96': 'Thunderstorm with slight hail',
   'forecast.weather_code.99': 'Thunderstorm with heavy hail',
 
+  'forecast.title': 'Forecast',
+
+  'outfit.title': 'Outfit',
   'outfit.top': 'Top',
   'outfit.bottom': 'Bottom',
   'outfit.footwear': 'Footwear',

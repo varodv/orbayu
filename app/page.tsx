@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { DailyForecastCard } from '@/components/daily-forecast-card';
 import { LocationPicker } from '@/components/location-picker';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
@@ -10,6 +11,8 @@ export default function Home() {
   const { location, setLocation } = useLocation();
 
   const { status, data, error } = useForecast();
+
+  const [activeTab, setActiveTab] = useState('outfit');
 
   return (
     <div className="flex flex-col gap-4 flex-1">
@@ -28,7 +31,12 @@ export default function Home() {
                 <CarouselContent>
                   {data.daily.map(item => (
                     <CarouselItem key={item.time.toISOString()}>
-                      <DailyForecastCard className="h-full" data={item} />
+                      <DailyForecastCard
+                        className="h-full"
+                        data={item}
+                        activeTab={activeTab}
+                        onActiveTabChange={setActiveTab}
+                      />
                     </CarouselItem>
                   ))}
                 </CarouselContent>
