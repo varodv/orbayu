@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { computeForecast } from '@/lib/forecast';
 import { getOutfit } from '@/lib/outfit';
-import { OutfitItem } from './outfit-item';
+import { Outfit } from './outfit';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { WeatherCodeIcon } from './weather-code-icon';
@@ -44,25 +44,8 @@ export function DailyForecastCard({ className, data, activeTab, onActiveTabChang
             <TabsTrigger value="outfit">{$t({ id: 'outfit.title' })}</TabsTrigger>
             <TabsTrigger value="data">{$t({ id: 'forecast.title' })}</TabsTrigger>
           </TabsList>
-          <TabsContent className="grid grid-cols-2 gap-2" value="outfit">
-            <div className="flex flex-col gap-2">
-              <OutfitItem part="outerwear" item={outfit.outerwear} />
-              <OutfitItem part="midLayer" item={outfit.midLayer} />
-              <OutfitItem part="baseLayer" item={outfit.baseLayer} />
-              <OutfitItem part="bottom" item={outfit.bottom} />
-              <OutfitItem part="footwear" item={outfit.footwear} />
-            </div>
-            <div className="flex flex-col gap-2">
-              {!outfit.accessories.length
-                ? (
-                    <OutfitItem part="accessories" item={undefined} />
-                  )
-                : (
-                    outfit.accessories.map(accessory => (
-                      <OutfitItem key={accessory.key} part="accessories" item={accessory} />
-                    ))
-                  )}
-            </div>
+          <TabsContent value="outfit">
+            <Outfit value={outfit} />
           </TabsContent>
           <TabsContent value="data">
             <pre className="text-xs">{JSON.stringify(computedData, null, 2)}</pre>
