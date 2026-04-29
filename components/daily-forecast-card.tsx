@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { computeForecast } from '@/lib/forecast';
 import { getOutfit } from '@/lib/outfit';
+import { OutfitItem } from './outfit-item';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { WeatherCodeIcon } from './weather-code-icon';
@@ -43,26 +44,24 @@ export function DailyForecastCard({ className, data, activeTab, onActiveTabChang
             <TabsTrigger value="outfit">{$t({ id: 'outfit.title' })}</TabsTrigger>
             <TabsTrigger value="data">{$t({ id: 'forecast.title' })}</TabsTrigger>
           </TabsList>
-          <TabsContent className="grid grid-cols-2 gap-4 text-center" value="outfit">
-            <div className="flex flex-col gap-1">
-              <p className="uppercase">{`[ ${$t({ id: 'outfit.top' })} ]`}</p>
-              {outfit.outerwear && <p>{outfit.outerwear.key}</p>}
-              {outfit.midLayer && <p>{outfit.midLayer.key}</p>}
-              <p>{outfit.baseLayer.key}</p>
+          <TabsContent className="grid grid-cols-2 gap-2" value="outfit">
+            <div className="flex flex-col gap-2">
+              <OutfitItem part="outerwear" item={outfit.outerwear} />
+              <OutfitItem part="midLayer" item={outfit.midLayer} />
+              <OutfitItem part="baseLayer" item={outfit.baseLayer} />
+              <OutfitItem part="bottom" item={outfit.bottom} />
+              <OutfitItem part="footwear" item={outfit.footwear} />
             </div>
-            <div className="flex flex-col gap-1 row-span-3">
-              <p className="uppercase">{`[ ${$t({ id: 'outfit.accessories' })} ]`}</p>
-              {outfit.accessories.map(item => (
-                <p key={item.key}>{item.key}</p>
-              ))}
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="uppercase">{`[ ${$t({ id: 'outfit.bottom' })} ]`}</p>
-              <p>{outfit.bottom.key}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="uppercase">{`[ ${$t({ id: 'outfit.footwear' })} ]`}</p>
-              <p>{outfit.footwear.key}</p>
+            <div className="flex flex-col gap-2">
+              {!outfit.accessories.length
+                ? (
+                    <OutfitItem part="accessories" item={undefined} />
+                  )
+                : (
+                    outfit.accessories.map(accessory => (
+                      <OutfitItem key={accessory.key} part="accessories" item={accessory} />
+                    ))
+                  )}
             </div>
           </TabsContent>
           <TabsContent value="data">
