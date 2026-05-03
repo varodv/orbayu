@@ -8,6 +8,8 @@ export const MESSAGES_EN = {
   'location-picker.user.permission.denied': 'Location permission denied',
   'location-picker.user.error': 'Error getting current location',
 
+  'forecast.error': 'Error getting forecast',
+
   'forecast.temperature': 'Daily temperature',
   'forecast.apparent_temperature': 'Apparent',
 
@@ -86,9 +88,11 @@ export const MESSAGES_ES: typeof MESSAGES_EN = {
   'location-picker.search.help': 'Escribe al menos 2 letras para buscar',
   'location-picker.search.empty': 'No hay resultados',
   'location-picker.search.error': 'Error al buscar',
-  'location-picker.user.current': 'Usar mi ubicación',
-  'location-picker.user.permission.denied': 'Permiso denegado',
-  'location-picker.user.error': 'Error de ubicación',
+  'location-picker.user.current': 'Usar ubicación actual',
+  'location-picker.user.permission.denied': 'Permiso de ubicación denegado',
+  'location-picker.user.error': 'Error al obtener la ubicación actual',
+
+  'forecast.error': 'Error al obtener la previsión',
 
   'forecast.temperature': 'Temperatura diaria',
   'forecast.apparent_temperature': 'Sensación',

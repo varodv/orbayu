@@ -2,14 +2,18 @@
 
 import type { CarouselApi } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { DailyForecastCard } from '@/components/daily-forecast-card';
 import { DatePicker } from '@/components/date-picker';
 import { LocationPicker } from '@/components/location-picker';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Spinner } from '@/components/ui/spinner';
 import { useForecast } from '@/hooks/use-forecast';
 import { useLocation } from '@/hooks/use-location';
 
 export default function Home() {
+  const { $t } = useIntl();
+
   const { location, setLocation } = useLocation();
 
   const { status, data, error } = useForecast();
@@ -42,14 +46,16 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-4 flex-1">
       <LocationPicker className="self-center" value={location} onChange={setLocation} />
-      {status === 'pending' && <p className="text-center">Loading...</p>}
+      {status === 'pending' && <Spinner className="self-center size-6" />}
       {status === 'error' && (
-        <p className="text-destructive text-center">{error?.message || 'Failed to get forecast'}</p>
+        <p className="text-destructive text-center">
+          {error?.message || $t({ id: 'forecast.error' })}
+        </p>
       )}
       {status === 'success'
         && (!data?.daily.length
           ? (
-              <p className="text-center">No forecast data</p>
+              <p className="text-destructive text-center">{$t({ id: 'forecast.error' })}</p>
             )
           : (
               <>
