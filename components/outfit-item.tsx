@@ -12,7 +12,7 @@ export function OutfitItem({ className, value, part }: Props) {
   const { $t } = useIntl();
 
   return (
-    <Item className={className} variant="muted">
+    <Item className={className} variant="muted" size="xs">
       <ItemContent>
         <ItemTitle className={!value ? 'text-muted-foreground' : ''}>
           {$t({ id: `outfit.item.${value?.key ?? 'none'}` })}
