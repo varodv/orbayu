@@ -35,8 +35,8 @@ const queryParamsSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const queryParams = Object.fromEntries(request.nextUrl.searchParams.entries());
   try {
-    const queryParams = Object.fromEntries(request.nextUrl.searchParams.entries());
     const parsedQueryParams = queryParamsSchema.safeParse(queryParams);
 
     if (!parsedQueryParams.success) {

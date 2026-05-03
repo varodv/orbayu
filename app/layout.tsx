@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { Geist } from 'next/font/google';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
@@ -29,7 +29,7 @@ const geist = Geist({
   variable: '--font-sans',
 });
 
-export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const acceptLanguage = (await headers()).get('accept-language');
   const locale = acceptLanguage?.startsWith('es') ? 'es' : 'en';
 
@@ -50,5 +50,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </div>
       </body>
     </html>
+  );
+}
+
+export default function (props: ComponentProps<typeof RootLayout>) {
+  return (
+    <Suspense>
+      <RootLayout {...props} />
+    </Suspense>
   );
 }
