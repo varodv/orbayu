@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import RootLayout from './layout';
 
 describe('RootLayout', () => {
@@ -8,14 +8,20 @@ describe('RootLayout', () => {
         variable: '--font-sans',
       }),
     }));
+
+    vi.mock('next/headers', () => ({
+      headers: async () => new Map([['accept-language', 'en']]),
+    }));
   });
 
-  it('should render its children', () => {
-    render(
-      <RootLayout>
-        <div data-testid="child">Test Child</div>
-      </RootLayout>,
-    );
+  it('should render its children', async () => {
+    await act(async () => {
+      render(
+        <RootLayout>
+          <div data-testid="child">Test Child</div>
+        </RootLayout>,
+      );
+    });
 
     const child = screen.getByTestId('child');
     expect(child).toBeDefined();
