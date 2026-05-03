@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { computeForecast } from '@/lib/forecast';
 import { getOutfit } from '@/lib/outfit';
+import { cn } from '@/lib/utils';
 import { Outfit } from './outfit';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -11,11 +12,18 @@ import { WeatherCodeIcon } from './weather-code-icon';
 interface Props {
   className?: string;
   data: DailyForecast<Date>;
+  isToday?: boolean;
   activeTab: string;
-  onActiveTabChange: (activeTab: string) => void;
+  onActiveTabChange: (newActiveTab: string) => void;
 }
 
-export function DailyForecastCard({ className, data, activeTab, onActiveTabChange }: Props) {
+export function DailyForecastCard({
+  className,
+  data,
+  isToday,
+  activeTab,
+  onActiveTabChange,
+}: Props) {
   const { $t, formatDate } = useIntl();
 
   const computedData = useMemo(() => computeForecast(data), [data]);
@@ -25,7 +33,7 @@ export function DailyForecastCard({ className, data, activeTab, onActiveTabChang
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-center">
+        <CardTitle className={cn('text-center', { 'text-destructive': isToday })}>
           {formatDate(computedData.time, {
             year: 'numeric',
             month: 'long',
@@ -39,7 +47,7 @@ export function DailyForecastCard({ className, data, activeTab, onActiveTabChang
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs className="gap-4" value={activeTab} onValueChange={onActiveTabChange}>
+        <Tabs value={activeTab} onValueChange={onActiveTabChange}>
           <TabsList className="w-full">
             <TabsTrigger value="outfit">{$t({ id: 'outfit.title' })}</TabsTrigger>
             <TabsTrigger value="data">{$t({ id: 'forecast.title' })}</TabsTrigger>
