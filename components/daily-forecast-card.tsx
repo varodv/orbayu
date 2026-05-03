@@ -33,7 +33,9 @@ export function DailyForecastCard({
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className={cn('text-center', { 'text-destructive': isToday })}>
+        <CardTitle
+          className={cn('text-center first-letter:uppercase', { 'text-destructive': isToday })}
+        >
           {formatDate(computedData.time, {
             year: 'numeric',
             month: 'long',

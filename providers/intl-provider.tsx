@@ -1,10 +1,18 @@
+'use client';
+
 import type { PropsWithChildren } from 'react';
 import { IntlProvider as ReactIntlProvider } from 'react-intl';
-import { MESSAGES_EN } from '@/i18n';
+import { MESSAGES_EN, MESSAGES_ES } from '@/i18n';
 
-export function IntlProvider({ children }: PropsWithChildren) {
+interface Props extends PropsWithChildren {
+  locale: 'en' | 'es';
+}
+
+export function IntlProvider({ locale, children }: Props) {
+  const messages = locale === 'es' ? MESSAGES_ES : MESSAGES_EN;
+
   return (
-    <ReactIntlProvider locale="en" messages={MESSAGES_EN}>
+    <ReactIntlProvider locale={locale} messages={messages}>
       {children}
     </ReactIntlProvider>
   );

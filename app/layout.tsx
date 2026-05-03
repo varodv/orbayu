@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Geist } from 'next/font/google';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 import { Footer } from '@/components/footer';
 import { LocationContextProvider } from '@/context/location-context';
@@ -28,12 +29,15 @@ const geist = Geist({
   variable: '--font-sans',
 });
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const acceptLanguage = (await headers()).get('accept-language');
+  const locale = acceptLanguage?.startsWith('es') ? 'es' : 'en';
+
   return (
-    <html lang="en" className={cn('h-full font-sans antialiased', geist.variable)}>
+    <html lang={locale} className={cn('h-full font-sans antialiased', geist.variable)}>
       <body className="h-full">
         <div className="flex flex-col gap-4 max-w-xl min-h-full p-4 mx-auto">
-          <IntlProvider>
+          <IntlProvider locale={locale}>
             <QueryClientProvider>
               <LocationContextProvider>
                 <main className="flex flex-col flex-1">
