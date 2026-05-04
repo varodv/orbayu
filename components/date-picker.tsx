@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function DatePicker({ className, data, activeIndex, onActiveIndexChange }: Props) {
-  const { formatDate } = useIntl();
+  const { formatDate, formatNumber } = useIntl();
 
   return (
     <Tabs
@@ -25,11 +25,11 @@ export function DatePicker({ className, data, activeIndex, onActiveIndexChange }
           return (
             <TabsTrigger
               key={item.time.toISOString()}
-              className="flex flex-col gap-0 p-1"
+              className="flex flex-col gap-0 text-xs"
               value={index.toString()}
             >
               <span
-                className={cn('text-xs uppercase', {
+                className={cn('uppercase', {
                   'text-destructive/60': index === 0,
                   'text-destructive': index === 0 && index === activeIndex,
                 })}
@@ -37,6 +37,10 @@ export function DatePicker({ className, data, activeIndex, onActiveIndexChange }
                 {formatDate(item.time, { weekday: 'short' })}
               </span>
               <WeatherCodeIcon className="size-6" value={item.weather_code} />
+              <span>
+                {formatNumber(item.apparent_temperature, { maximumFractionDigits: 0 })}
+                º
+              </span>
             </TabsTrigger>
           );
         })}
